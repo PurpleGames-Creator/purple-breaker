@@ -103,18 +103,18 @@ const STAGE_PATTERNS = [
     '.............',
     '..SSSSSSSSS..',
   ],
-  // 4: 上下2ブロック。中央に横の隙間。銀を斜めに散りばめた配置
+  // 4: 上下2ブロック。中央に横の隙間。両端(0,12列)を空けて玉が横から入れる。銀を斜めに散りばめた配置
   [
-    'NSNNSNNSNNSNN',
-    'NNSNNSNNSNNSN',
-    'SNNSNNSNNSNNS',
-    'NNSNNSNNSNNSN',
+    '.SNNSNNSNNSN.',
+    '.NNSNNSNNSNN.',
+    '.NSNNSNNSNNS.',
+    '.SNNSNNSNNSN.',
     '.............',
     '.............',
-    'NSNNSNNSNNSNN',
-    'NNSNNSNNSNNSN',
-    'SNNSNNSNNSNNS',
-    'NNSNNSNNSNNSN',
+    '.SNNSNNSNNSN.',
+    '.NNSNNSNNSNN.',
+    '.NSNNSNNSNNS.',
+    '.SNNSNNSNNSN.',
   ],
   // 5: 左右2ブロック。両端・中央に玉が入る隙間（.）をあける。銀を散りばめた配置がポイント
   [
