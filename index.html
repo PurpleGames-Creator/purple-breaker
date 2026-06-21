@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Purple Breaker</title>
+  <meta name="apple-mobile-web-app-title" content="Purple Breaker" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="manifest" href="./manifest.json" />
+</head>
+<body>
+  <div id="app">
+    <div id="error-banner" aria-live="polite"></div>
+
+    <!-- ホーム画面（Purple Jumper と同じトップUI） -->
+    <main id="screen-home" class="screen screen--active">
+      <div class="start-card">
+        <div class="start-title">🟣Purple Breaker🟣</div>
+        <div class="demo-stage">
+          <canvas id="demo-canvas" class="demo-canvas" aria-label="自動プレイのデモ"></canvas>
+        </div>
+        <div class="start-label-row">
+          <a class="start-logo-link" href="https://purple-park.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Purple Park のホームページへ">
+            <img src="./logo.png" alt="Purple Park" class="start-logo" draggable="false" />
+          </a>
+          <span class="start-label">ニックネームを入力してください</span>
+        </div>
+        <input id="nickname" class="start-input" type="text" maxlength="12" placeholder="例: むらさき太郎" />
+        <button id="start-button" class="primary-btn">ゲームスタート</button>
+        <div id="top-ranking" class="top-ranking">
+          <div class="top-ranking-title">
+            <span id="rank-prev" class="rank-arrow">◀</span>
+            <span id="rank-title-text">今日のランキング</span>
+            <span id="rank-next" class="rank-arrow">▶</span>
+          </div>
+          <ol id="top-ranking-list" class="top-ranking-list"></ol>
+        </div>
+      </div>
+    </main>
+
+    <!-- ゲーム画面 -->
+    <main id="screen-game" class="screen">
+      <header class="game-header">
+        <span id="lives-value" class="game-lives-value"><img src="./paputaro.png" class="life-icon" alt=""><img src="./paputaro.png" class="life-icon" alt=""></span>
+        <span id="score-value" class="game-score-value">0</span>
+        <button id="pause-button" class="pause-button" type="button" aria-label="ゲームを一時停止">❚❚</button>
+        <button id="quit-button" class="quit-button" type="button" aria-label="やめてトップへ戻る">
+          <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+        </button>
+      </header>
+      <section class="game-section">
+        <div class="game-field-wrapper">
+          <canvas id="game-field" class="game-field" width="500" height="720"></canvas>
+        </div>
+        <p class="move-hint" id="move-hint">← マウス / ドラッグ / ← → でパドル移動 →</p>
+      </section>
+    </main>
+
+    <!-- ゲームオーバーモーダル -->
+    <div id="gameover-overlay" class="gameover-overlay" aria-hidden="true">
+      <div class="gameover-dialog">
+        <h2 class="gameover-title">GAME OVER</h2>
+        <p class="gameover-score">
+          <span class="gameover-score-label">今回の記録：</span>
+          <span id="gameover-score-value" class="gameover-score-value">0</span>
+          <span class="gameover-score-unit">pt</span>
+        </p>
+        <p class="gameover-stats">
+          <span>最大コンボ <b id="gameover-combo">0</b></span>
+          <span class="gameover-stats-sep">／</span>
+          <span>ステージ <b id="gameover-stage">1</b></span>
+        </p>
+        <p id="gameover-badge" class="gameover-badge gameover-badge--hidden">🎉 自己ベスト更新！ 🎉</p>
+        <div class="gameover-actions">
+          <button id="gameover-retry" class="gameover-button gameover-button--primary" type="button">再挑戦</button>
+          <button id="gameover-home" class="gameover-button gameover-button--secondary" type="button">トップへ戻る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- トップへ戻る確認ダイアログ -->
+    <div id="confirm-overlay" class="gameover-overlay" aria-hidden="true">
+      <div class="gameover-dialog">
+        <h2 class="confirm-title">トップに戻りますか？</h2>
+        <div class="gameover-actions">
+          <button id="confirm-yes" class="gameover-button gameover-button--primary" type="button"><svg class="home-icon home-icon--btn" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>トップに戻る</button>
+          <button id="confirm-no" class="gameover-button gameover-button--secondary" type="button">つづける</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./supabase-config.js?v=59" defer></script>
+  <script src="./supabase-api.js?v=59" defer></script>
+  <script src="./game.js?v=59" defer></script>
+  <script src="./main.js?v=59" defer></script>
+</body>
+</html>
