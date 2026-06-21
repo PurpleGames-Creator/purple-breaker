@@ -1183,6 +1183,16 @@ class BreakerGame {
   }
 
   _drawOverlays(ctx) {
+    // 現在ステージ（常時・左上に小さく表示）
+    if (!this.isOver) {
+      ctx.fillStyle = 'rgba(233,213,255,0.85)';
+      ctx.font = '700 17px "Orbitron", system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('STAGE ' + this.stage, 12, 10);
+      ctx.textBaseline = 'alphabetic';
+    }
+
     // コンボ表示（2連鎖以上の間ずっと表示。加算のたびに「ぴょん」と跳ねる。段階で色変化）
     if (this.combo >= 2 && !this.isOver) {
       const tier = this._comboTier();
