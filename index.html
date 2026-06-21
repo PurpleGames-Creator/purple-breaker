@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=61" />
   <link rel="manifest" href="./manifest.json" />
 </head>
 <body>
@@ -45,12 +45,12 @@
     <!-- ゲーム画面 -->
     <main id="screen-game" class="screen">
       <header class="game-header">
-        <span id="lives-value" class="game-lives-value"><img src="./paputaro.png" class="life-icon" alt=""><img src="./paputaro.png" class="life-icon" alt=""></span>
-        <span id="score-value" class="game-score-value">0</span>
-        <button id="pause-button" class="pause-button" type="button" aria-label="ゲームを一時停止">❚❚</button>
         <button id="quit-button" class="quit-button" type="button" aria-label="やめてトップへ戻る">
           <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
         </button>
+        <span id="lives-value" class="game-lives-value"><img src="./paputaro.png" class="life-icon" alt=""><img src="./paputaro.png" class="life-icon" alt=""></span>
+        <span id="score-value" class="game-score-value">0</span>
+        <button id="pause-button" class="pause-button" type="button" aria-label="ゲームを一時停止">❚❚</button>
       </header>
       <section class="game-section">
         <div class="game-field-wrapper">
@@ -94,9 +94,9 @@
     </div>
   </div>
 
-  <script src="./supabase-config.js?v=60" defer></script>
-  <script src="./supabase-api.js?v=60" defer></script>
-  <script src="./game.js?v=60" defer></script>
-  <script src="./main.js?v=60" defer></script>
+  <script src="./supabase-config.js?v=61" defer></script>
+  <script src="./supabase-api.js?v=61" defer></script>
+  <script src="./game.js?v=61" defer></script>
+  <script src="./main.js?v=61" defer></script>
 </body>
 </html>

@@ -225,22 +225,23 @@ body {
 .game-header {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto; /* 家 / 残機 / スコア / 一時停止 */
   align-items: center;
-  gap: 12px;
-  padding: 12px 12px;
+  gap: 10px;
+  padding: 10px 12px;
   background: rgba(0, 0, 0, 0.4);
   border-bottom: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .game-lives-value {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1px 2px;
+  align-content: center;
+  flex-wrap: wrap;          /* 多いときは2列に折り返す */
+  gap: 2px;
   min-height: 22px;
-  max-width: 46%;
+  max-width: 118px;         /* 1列あたり最大~6個。10機(9個)で2列になる */
   justify-self: start;
 }
 
@@ -295,10 +296,11 @@ body {
   color: #cbd5f5;
   font-size: 1.1rem;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 6px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
+  justify-self: start;
 }
 
 .home-icon {
