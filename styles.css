@@ -323,7 +323,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* 上に詰める（中央寄せの上余白をなくす） */
   background: linear-gradient(160deg, #0a0015, #08010f);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   overflow: hidden;
