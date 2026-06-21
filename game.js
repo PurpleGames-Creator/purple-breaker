@@ -798,13 +798,15 @@ class BreakerGame {
 
   _updateCapsules(dt) {
     const p = this.paddle;
+    // 判定幅は「バー」と「パプ太郎の体(幅152)」の広い方。パプ太郎の体に触れても獲得
+    const halfW = Math.max(p.w / 2, PADDLE_PAPUTARO_W / 2);
     const remaining = [];
     for (const cap of this.capsules) {
       cap.y += CAPSULE_SPEED * dt;
-      // パドルでキャッチ
-      const withinX = cap.x >= p.x - p.w / 2 - CAPSULE_W / 2 && cap.x <= p.x + p.w / 2 + CAPSULE_W / 2;
-      const withinY = cap.y + CAPSULE_H / 2 >= p.y - p.h / 2 && cap.y - CAPSULE_H / 2 <= p.y + p.h / 2;
-      if (withinX && withinY) {
+      // パドル上端まで落ちてきて、バー/パプ太郎の横幅内ならキャッチ（体は下端まであるので下限は不要）
+      const reachedPaddle = cap.y + CAPSULE_H / 2 >= p.y - p.h / 2;
+      const withinX = cap.x >= p.x - halfW - CAPSULE_W / 2 && cap.x <= p.x + halfW + CAPSULE_W / 2;
+      if (reachedPaddle && withinX) {
         this._applyPowerUp(cap.type);
         continue;
       }
