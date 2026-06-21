@@ -367,6 +367,17 @@ body {
   transition: opacity 0.5s;
 }
 
+.stage-label {
+  margin: 10px 0 0;
+  text-align: center;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.12em;
+  color: #c4b5fd;
+  text-shadow: 0 0 14px rgba(124, 58, 237, 0.8);
+}
+
 /* ========== ゲームオーバー ========== */
 
 .gameover-overlay {

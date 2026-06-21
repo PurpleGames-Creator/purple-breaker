@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fieldEl: document.getElementById('game-field'),
       scoreEl,
       livesEl,
+      stageEl: document.getElementById('stage-label'),
       nickname,
       startStage,
       onGameOver: handleGameOver,

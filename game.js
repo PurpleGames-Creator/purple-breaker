@@ -274,6 +274,7 @@ class BreakerGame {
     this.ctx = this.canvas.getContext('2d');
     this.scoreEl = opts.scoreEl;
     this.livesEl = opts.livesEl || null;
+    this.stageEl = opts.stageEl || null;
     this.nickname = opts.nickname;
     this.onScore = opts.onScore || (() => {});
     this.onGameOver = opts.onGameOver || (() => {});
@@ -507,6 +508,7 @@ class BreakerGame {
     this._playStageJingle(); // 開始ファンファーレ
     this.lastTs = performance.now();
     this._updateHud();
+    this._updateStageLabel();
     if (this.demo) this._launchBalls(); // デモは自動で発射
     const loop = (ts) => {
       this.rafId = requestAnimationFrame(loop);
@@ -941,6 +943,7 @@ class BreakerGame {
     // 次ステージ用カウンタ初期化
     this.missedThisStage = false;
     this.stageTime = 0;
+    this._updateStageLabel();
     this._showFlash('STAGE ' + this.stage, 1.2);
     this._playStageJingle(); // 次ステージ開始のファンファーレ
   }
@@ -1000,9 +1003,14 @@ class BreakerGame {
 
   _updateHud() {
     // 表示は「予備の残機」（いまプレイ中の1球は含めない）。3回ミスでゲームオーバー＝開始時パプ太郎2つ
-    if (!this.livesEl) return;
-    const n = Math.max(0, this.lives - 1);
-    this.livesEl.innerHTML = '<img src="./paputaro.png" class="life-icon" alt="">'.repeat(n);
+    if (this.livesEl) {
+      const n = Math.max(0, this.lives - 1);
+      this.livesEl.innerHTML = '<img src="./paputaro.png" class="life-icon" alt="">'.repeat(n);
+    }
+  }
+
+  _updateStageLabel() {
+    if (this.stageEl) this.stageEl.textContent = 'STAGE ' + this.stage;
   }
 
   _showFlash(text, sec) {
@@ -1026,9 +1034,25 @@ class BreakerGame {
     this._drawBricks(ctx);
     this._drawLasers(ctx);
     this._drawPaddle(ctx);
+    this._drawFloorPlate(ctx); // パプ太郎の切れ目を隠す銀の板
     this._drawBalls(ctx);
     this._drawCapsules(ctx);
     this._drawOverlays(ctx);
+  }
+
+  /** 画面下端に銀の板を横一直線に引く（パプ太郎の下半身の切れ目を自然に隠す） */
+  _drawFloorPlate(ctx) {
+    const ph = 18;
+    const py = FIELD_H - ph;
+    const g = ctx.createLinearGradient(0, py, 0, FIELD_H);
+    g.addColorStop(0, '#e2e8f0');
+    g.addColorStop(0.5, '#94a3b8');
+    g.addColorStop(1, '#5b626d');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, py, FIELD_W, ph);
+    // 上端の照りハイライト
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillRect(0, py, FIELD_W, 2);
   }
 
   _drawBricks(ctx) {
@@ -1186,16 +1210,6 @@ class BreakerGame {
   }
 
   _drawOverlays(ctx) {
-    // 現在ステージ（常時・左上に小さく表示）
-    if (!this.isOver) {
-      ctx.fillStyle = 'rgba(233,213,255,0.85)';
-      ctx.font = '700 17px "Orbitron", system-ui, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText('STAGE ' + this.stage, 12, 10);
-      ctx.textBaseline = 'alphabetic';
-    }
-
     // コンボ表示（2連鎖以上の間ずっと表示。加算のたびに「ぴょん」と跳ねる。段階で色変化）
     if (this.combo >= 2 && !this.isOver) {
       const tier = this._comboTier();
