@@ -221,7 +221,7 @@ const STAGE_PATTERNS = [
 ];
 
 // カプセル（パワーアップ）
-const CAPSULE_DROP_CHANCE = 0.10; // ブロック破壊時にアイテムが落ちる確率（全体）
+const CAPSULE_DROP_CHANCE = 0.08; // ブロック破壊時にアイテムが落ちる確率（全体）
 const CAPSULE_W = 30;
 const CAPSULE_H = 16;
 const CAPSULE_SPEED = 170;        // 落下速度(px/s)
@@ -247,7 +247,7 @@ const LASER_SPEED = 760;     // 上昇速度(px/s)
 const LASER_W = 4;
 const LASER_H = 16;
 const LASER_DURATION = 10;   // L取得から撃てる秒数
-const THROUGH_DURATION = 10; // 貫通ボールの継続秒数
+const THROUGH_DURATION = 5; // 貫通ボールの継続秒数
 
 // デモ（トップ画面の自動プレイ）用：自動パドルの追従速度
 const AUTO_PADDLE_SPEED = 700;
