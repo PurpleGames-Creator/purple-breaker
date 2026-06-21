@@ -14,6 +14,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* 画像の長押しメニュー（共有/保存/コピー等）・ドラッグを無効化 */
+img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -252,6 +255,11 @@ body {
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 3px rgba(168, 85, 247, 0.55));
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* 長押しの画像メニュー（共有/保存/コピー等）を無効化 */
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .game-score-value {
