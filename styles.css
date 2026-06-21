@@ -226,7 +226,7 @@ body {
 .game-header {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto auto; /* 家 / 残機 / スコア / 一時停止 */
+  grid-template-columns: 1fr auto auto; /* 家 / スコア / 一時停止 */
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
@@ -235,19 +235,20 @@ body {
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
+/* 残機（ミニパプ太郎）：STAGE表示の下に中央寄せ。多くても折り返してバランスよく */
 .game-lives-value {
   display: flex;
   align-items: center;
   align-content: center;
-  flex-wrap: wrap;          /* 多いときは2列に折り返す */
-  gap: 2px;
-  min-height: 22px;
-  max-width: 118px;         /* 1列あたり最大~6個。10機(9個)で2列になる */
-  justify-self: start;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 8px auto 0;
+  max-width: 92%;
 }
 
 .life-icon {
-  height: 20px;
+  height: 26px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 3px rgba(168, 85, 247, 0.55));
