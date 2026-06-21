@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // パドルを動かしたら操作ヒントを消す
-  document.getElementById('game-field')?.addEventListener('pointerdown', () => {
+  document.querySelector('.game-section')?.addEventListener('pointerdown', () => {
     if (moveHint) moveHint.style.opacity = '0';
   });
 

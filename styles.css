@@ -26,6 +26,7 @@ html, body {
   position: fixed;
   top: 0; left: 0;
   overscroll-behavior: none;
+  touch-action: manipulation; /* ダブルタップ拡大を無効化（スクロールは維持） */
 }
 
 body {
@@ -330,6 +331,8 @@ body {
   padding-bottom: max(16px, env(safe-area-inset-bottom));
   user-select: none;
   -webkit-user-select: none;
+  touch-action: none; /* エリア全体でタップ発射・操作を受けるため */
+  cursor: pointer;
 }
 
 .game-field-wrapper {

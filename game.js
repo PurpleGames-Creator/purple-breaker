@@ -459,10 +459,12 @@ class BreakerGame {
       this._launchBalls();
     };
 
-    this.canvas.addEventListener('mousemove', this._onPointerMove);
-    this.canvas.addEventListener('mousedown', this._onPointerDown);
-    this.canvas.addEventListener('touchstart', this._onPointerDown, { passive: true });
-    this.canvas.addEventListener('touchmove', this._onPointerMove, { passive: true });
+    // 入力はゲーム画面エリア全体で受ける（パプ太郎より下の余白でも発射・操作できる）
+    this._inputTarget = this.canvas.closest('.game-section') || this.canvas;
+    this._inputTarget.addEventListener('mousemove', this._onPointerMove);
+    this._inputTarget.addEventListener('mousedown', this._onPointerDown);
+    this._inputTarget.addEventListener('touchstart', this._onPointerDown, { passive: true });
+    this._inputTarget.addEventListener('touchmove', this._onPointerMove, { passive: true });
 
     this._onKeyDown = (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'a') { this.keyLeft = true; e.preventDefault(); }
@@ -479,10 +481,11 @@ class BreakerGame {
 
   _unbindInput() {
     if (this.demo) return;
-    this.canvas.removeEventListener('mousemove', this._onPointerMove);
-    this.canvas.removeEventListener('mousedown', this._onPointerDown);
-    this.canvas.removeEventListener('touchstart', this._onPointerDown);
-    this.canvas.removeEventListener('touchmove', this._onPointerMove);
+    const t = this._inputTarget || this.canvas;
+    t.removeEventListener('mousemove', this._onPointerMove);
+    t.removeEventListener('mousedown', this._onPointerDown);
+    t.removeEventListener('touchstart', this._onPointerDown);
+    t.removeEventListener('touchmove', this._onPointerMove);
     document.removeEventListener('keydown', this._onKeyDown);
     document.removeEventListener('keyup', this._onKeyUp);
   }
