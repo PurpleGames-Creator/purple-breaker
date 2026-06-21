@@ -735,10 +735,15 @@ class BreakerGame {
       const overlapB = b.y + b.h - (ball.y - ball.r);
       const minX = Math.min(overlapL, overlapR);
       const minY = Math.min(overlapT, overlapB);
+      // 反射すると同時にボールをブロックの外側へ押し戻す。
+      // （金・銀など壊れずに残るブロックでは、押し戻さないとめり込んだまま
+      //   反射しきれず“すり抜け”が起こるため）
       if (minX < minY) {
-        ball.vx = overlapL < overlapR ? -Math.abs(ball.vx) : Math.abs(ball.vx);
+        if (overlapL < overlapR) { ball.vx = -Math.abs(ball.vx); ball.x = b.x - ball.r; }
+        else { ball.vx = Math.abs(ball.vx); ball.x = b.x + b.w + ball.r; }
       } else {
-        ball.vy = overlapT < overlapB ? -Math.abs(ball.vy) : Math.abs(ball.vy);
+        if (overlapT < overlapB) { ball.vy = -Math.abs(ball.vy); ball.y = b.y - ball.r; }
+        else { ball.vy = Math.abs(ball.vy); ball.y = b.y + b.h + ball.r; }
       }
 
       this._damageBrick(b);
