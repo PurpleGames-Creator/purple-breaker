@@ -132,15 +132,15 @@ const STAGE_PATTERNS = [
     '.NNSNN.NNSNN.',
     '.NSNNS.NSNNS.',
   ],
-  // 6: 大きなかさ（傘）。てっぺん・棒・縁・J字の取っ手=銀(S)、その他=通常
+  // 6: 大きなかさ（傘）。てっぺん・棒・縁・J字の取っ手=銀(S)、その他=通常。両端(0,12列)を空けて玉が横から入れる
   [
     '......S......',
     '....NNNNN....',
     '..NNNNNNNNN..',
     '.NNNNNNNNNNN.',
-    'NNNNNNNNNNNNN',
-    'NNNNNNNNNNNNN',
-    'S.S.S.S.S.S.S',
+    '.NNNNNNNNNNN.',
+    '.NNNNNNNNNNN.',
+    '.S.S.S.S.S.S.',
     '......S......',
     '......S......',
     '......S......',
