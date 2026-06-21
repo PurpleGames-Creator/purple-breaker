@@ -783,7 +783,9 @@ class BreakerGame {
     if (Math.random() >= CAPSULE_DROP_CHANCE) return; // 全体の落下率はステージ問わず一定
     // このステージで出さない種類を除外（除外分は残りの種類に振り分けられる）
     const patternIdx = (this.stage - 1) % STAGE_PATTERNS.length;
-    const excluded = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
+    const excludedBase = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
+    // 貫通ボール中は新たな貫通(T)を出さない
+    const excluded = this.through ? excludedBase.concat('T') : excludedBase;
     const pool = excluded.length ? CAPSULE_KEYS.filter((k) => !excluded.includes(k)) : CAPSULE_KEYS;
     if (pool.length === 0) return;
     const key = pool[Math.floor(Math.random() * pool.length)];
