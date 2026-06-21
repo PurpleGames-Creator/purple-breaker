@@ -304,7 +304,24 @@ async function loadTopRanking() {
 
     const medal = displayRank === 1 ? '🥇' : displayRank === 2 ? '🥈' : displayRank === 3 ? '🥉' : '';
     const cls = displayRank === 1 ? 'rank-1' : displayRank === 2 ? 'rank-2' : displayRank === 3 ? 'rank-3' : 'rank-4plus';
-    const text = (medal ? medal + ' ' : '') + displayRank + '位 ' + nickname + ' … ' + score + ' pt';
-    listEl.appendChild(createRankingLi(cls, text));
+
+    // 1行に収める：順位（固定）／ニックネーム（長い時だけ…省略）／スコア（固定）
+    const li = document.createElement('li');
+    li.className = cls + ' rank-row';
+
+    const head = document.createElement('span');
+    head.className = 'rank-head';
+    head.textContent = (medal ? medal + ' ' : '') + displayRank + '位';
+
+    const name = document.createElement('span');
+    name.className = 'rank-name';
+    name.textContent = nickname;
+
+    const scoreEl = document.createElement('span');
+    scoreEl.className = 'rank-score';
+    scoreEl.textContent = score + ' pt';
+
+    li.append(head, name, scoreEl);
+    listEl.appendChild(li);
   });
 }

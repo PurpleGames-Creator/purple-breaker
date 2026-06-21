@@ -73,7 +73,7 @@ body {
 
 .start-card {
   width: 100%;
-  max-width: 320px;
+  max-width: min(94vw, 380px);
   margin: 0 auto;
   padding: 24px 20px;
   border-radius: 18px;
@@ -223,6 +223,22 @@ body {
 .top-ranking-list li.rank-3 { font-size: 16px; font-weight: bold; }
 .top-ranking-list li.rank-4plus { font-size: 13px; }
 .top-ranking-list li.placeholder { color: #9ca3af; font-size: 13px; }
+
+/* 順位行を1行に収める：順位・スコアは固定幅、ニックネームだけ「…」で省略 */
+.top-ranking-list li.rank-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+.top-ranking-list li.rank-row .rank-head { flex-shrink: 0; }
+.top-ranking-list li.rank-row .rank-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-ranking-list li.rank-row .rank-score { flex-shrink: 0; }
 
 /* ========== ゲーム画面 ========== */
 
