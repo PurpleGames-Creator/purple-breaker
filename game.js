@@ -1227,7 +1227,7 @@ class BreakerGame {
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.font = '600 18px "Orbitron", system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('TAP / CLICK / SPACE で発射', FIELD_W / 2, FIELD_H - 110);
+      ctx.fillText('タップで発射', FIELD_W / 2, FIELD_H - 110);
     }
 
     if (this.flashTimer > 0) {
