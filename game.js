@@ -23,6 +23,13 @@ const PADDLE_H = 16;
 const PADDLE_BOTTOM_OFFSET = 48; // フィールド下端からの距離
 const PADDLE_KEY_SPEED = 620;    // キーボード操作時の移動速度(px/s)
 const MAX_BOUNCE_ANGLE = (60 * Math.PI) / 180; // パドル端で跳ね返る最大角
+// 永久ループ対策：反射後に縦速度が小さすぎる（ほぼ水平）と、金ブロックや壁の間を
+// 水平に往復し続けて落ちてこなくなる。速度の大きさは保ったまま、最低この角度ぶんの
+// 縦成分を確保して必ず上下動を残す。
+const MIN_VY_RATIO = Math.sin((14 * Math.PI) / 180); // 縦速度／全体速度 の下限（≒0.24）
+// 壊れない金ブロックに連続でこの回数当たり続けたら、周期軌道に嵌った可能性が高い。
+// ランダムに軌道を乱して脱出させる（通常プレイでは連続8回も当たらない）。
+const GOLD_STREAK_LIMIT = 8;
 
 // パプ太郎（パドルと一緒に動く。角の上にバーが乗る見た目）
 const PAPUTARO_NAT_W = 502;
@@ -357,7 +364,7 @@ class BreakerGame {
   }
 
   _makeBall(x, y, vx, vy, stuck) {
-    return { x, y, vx, vy, r: BALL_R, stuck: !!stuck, stuckOffset: 0, _fell: false };
+    return { x, y, vx, vy, r: BALL_R, stuck: !!stuck, stuckOffset: 0, _fell: false, goldStreak: 0 };
   }
 
   _spawnStuckBall() {
@@ -682,7 +689,42 @@ class BreakerGame {
 
     this._collidePaddle(ball);
     this._collideBricks(ball);
+    this._antiHorizontalGuard(ball);
     return false;
+  }
+
+  /**
+   * 反射後の軌道がほぼ水平になっていたら、速度の大きさは保ったまま縦成分を
+   * 最低 MIN_VY_RATIO ぶん確保する。水平の永久ループ（壁や金ブロックの間を
+   * 往復し続けて落ちてこない）を防ぐ。
+   */
+  _antiHorizontalGuard(ball) {
+    if (ball.stuck) return;
+    const speed = Math.hypot(ball.vx, ball.vy);
+    if (speed < 1e-3) return;
+    const minVy = speed * MIN_VY_RATIO;
+    if (Math.abs(ball.vy) >= minVy) return;
+    const signY = ball.vy >= 0 ? 1 : -1; // vy≈0 のときは下向き(+)に倒して落下を促す
+    const signX = ball.vx >= 0 ? 1 : -1;
+    ball.vy = signY * minVy;
+    ball.vx = signX * Math.sqrt(Math.max(0, speed * speed - minVy * minVy));
+  }
+
+  /**
+   * 壊れない金ブロックに連続で当たり続けて周期軌道に嵌ったとき、速度の大きさは
+   * 保ったまま進行方向をランダムに回転させて軌道を崩し、ループから脱出させる。
+   */
+  _breakGoldLoop(ball) {
+    const speed = Math.hypot(ball.vx, ball.vy);
+    if (speed < 1e-3) return;
+    let ang = Math.atan2(ball.vy, ball.vx);
+    const kick = ((12 + Math.random() * 16) * Math.PI) / 180; // ±12〜28°
+    ang += (Math.random() < 0.5 ? -1 : 1) * kick;
+    ball.vx = speed * Math.cos(ang);
+    ball.vy = speed * Math.sin(ang);
+    // 画面上側に張り付いている場合は確実に落下方向へ向ける
+    if (ball.y < FIELD_H * 0.5 && ball.vy < 0) ball.vy = Math.abs(ball.vy);
+    ball.goldStreak = 0;
   }
 
   _collidePaddle(ball) {
@@ -707,6 +749,7 @@ class BreakerGame {
     ball.vx = speed * Math.sin(angle);
     ball.vy = -Math.abs(speed * Math.cos(angle));
     ball.y = top - ball.r - 0.1;
+    ball.goldStreak = 0; // パドルに戻ったらループ判定リセット
     this.combo = 0; // パドルで弾いたらコンボ（連鎖）リセット
     this._sndPaddle();
     this._vibrate(12); // スマホで一瞬バイブ
@@ -747,6 +790,13 @@ class BreakerGame {
       }
 
       this._damageBrick(b);
+      // 壊れない金に連続で当たり続けたらループ脱出。壊せるブロックに当たったらリセット。
+      if (b.type === 'gold') {
+        ball.goldStreak++;
+        if (ball.goldStreak >= GOLD_STREAK_LIMIT) this._breakGoldLoop(ball);
+      } else {
+        ball.goldStreak = 0;
+      }
       break; // 1ステップで1ブロックのみ（貫通でない場合）
     }
   }
