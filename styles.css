@@ -161,6 +161,27 @@ body {
 
 .start-input:focus { box-shadow: 0 0 0 1px rgba(196, 181, 253, 0.9); }
 
+.start-input.invalid {
+  border-color: #ff6b8a;
+  box-shadow: 0 0 0 3px rgba(255, 107, 138, 0.3);
+  animation: nickShake 0.4s;
+}
+
+.nickname-error {
+  min-height: 1.1em;
+  margin: -6px 0 10px;
+  color: #ff6b8a;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@keyframes nickShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
 .primary-btn {
   padding: 10px 20px;
   border-radius: 999px;
