@@ -255,6 +255,8 @@ const BONUS_STAGE_PATTERN = [
 
 // カプセル（パワーアップ）
 const CAPSULE_DROP_CHANCE = 0.08; // ブロック破壊時にアイテムが落ちる確率（全体）
+const BONUS_CAPSULE_DROP_CHANCE = 0.20; // BONUS STAGE の落下率（大量に降らせる）
+const BONUS_D_RATIO = 0.9;        // BONUS STAGE で落ちるアイテムのうち玉増し(D)の割合
 const CAPSULE_W = 30;
 const CAPSULE_H = 16;
 const CAPSULE_SPEED = 170;        // 落下速度(px/s)
@@ -874,20 +876,29 @@ class BreakerGame {
   }
 
   _maybeDropCapsule(b) {
-    if (Math.random() >= CAPSULE_DROP_CHANCE) return; // 全体の落下率はステージ問わず一定
-    // このステージで出さない種類を除外（除外分は残りの種類に振り分けられる）
-    const patternIdx = (this.stage - 1) % STAGE_PATTERNS.length;
-    let excludedBase = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
-    // BONUS STAGE：レーザー(L)と1UP(P)は出さない
-    if (this.inBonus) excludedBase = excludedBase.concat('L', 'P');
-    // 貫通ボール中は新たな貫通(T)を出さない
-    const excluded = this.through ? excludedBase.concat('T') : excludedBase;
-    let pool = excluded.length ? CAPSULE_KEYS.filter((k) => !excluded.includes(k)) : CAPSULE_KEYS;
-    // BONUS STAGE：マルチボール(D)の出現確率を通常の2倍に（Dの重みを倍増）
-    // ※L(4)とP(1)を除外した5枠にD(5)を足すので総数18のままDが5→10＝ちょうど2倍
-    if (this.inBonus) pool = pool.concat(pool.filter((k) => k === 'D'));
-    if (pool.length === 0) return;
-    const key = pool[Math.floor(Math.random() * pool.length)];
+    // BONUS STAGE は落下率を上げて「玉増し(D)を大量に降らせる」
+    const dropChance = this.inBonus ? BONUS_CAPSULE_DROP_CHANCE : CAPSULE_DROP_CHANCE;
+    if (Math.random() >= dropChance) return;
+
+    let key;
+    if (this.inBonus) {
+      // BONUS：ほぼ玉増し(D)。たまに拡大(E)/貫通(T)。レーザー(L)・1UP(P)は出さない。
+      if (Math.random() < BONUS_D_RATIO) {
+        key = 'D';
+      } else {
+        // 貫通ボール中は新たな貫通(T)を出さない
+        key = (!this.through && Math.random() < 0.5) ? 'T' : 'E';
+      }
+    } else {
+      // 通常：このステージで出さない種類を除外（除外分は残りの種類に振り分けられる）
+      const patternIdx = (this.stage - 1) % STAGE_PATTERNS.length;
+      const excludedBase = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
+      // 貫通ボール中は新たな貫通(T)を出さない
+      const excluded = this.through ? excludedBase.concat('T') : excludedBase;
+      const pool = excluded.length ? CAPSULE_KEYS.filter((k) => !excluded.includes(k)) : CAPSULE_KEYS;
+      if (pool.length === 0) return;
+      key = pool[Math.floor(Math.random() * pool.length)];
+    }
     this.capsules.push({
       x: b.x + b.w / 2,
       y: b.y + b.h / 2,
