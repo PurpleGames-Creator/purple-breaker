@@ -227,6 +227,23 @@ const STAGE_PATTERNS = [
   ],
 ];
 
+/**
+ * BONUS STAGE の配置。10面クリアごと（毎ループ）に挿入される特別面。
+ * この面は「無敵」（ボールを落としても残機が減らない＝自動で打ち直し）。
+ * すべて通常ブロック(N)で埋め、短時間で大量得点を稼がせる。ステージ番号には含めない。
+ */
+const BONUS_STAGE_PATTERN = [
+  'NNNNNNNNNNNNN',
+  'N.N.N.N.N.N.N',
+  'NNNNNNNNNNNNN',
+  'N.N.N.N.N.N.N',
+  'NNNNNNNNNNNNN',
+  'N.N.N.N.N.N.N',
+  'NNNNNNNNNNNNN',
+  'N.N.N.N.N.N.N',
+  'NNNNNNNNNNNNN',
+];
+
 // カプセル（パワーアップ）
 const CAPSULE_DROP_CHANCE = 0.08; // ブロック破壊時にアイテムが落ちる確率（全体）
 const CAPSULE_W = 30;
@@ -320,6 +337,7 @@ class BreakerGame {
     this.maxCombo = 0;          // 最大コンボ
     this.missedThisStage = false; // このステージでミスしたか（ノーミスボーナス判定）
     this.stageTime = 0;         // このステージの経過秒（タイムボーナス判定）
+    this.inBonus = false;       // BONUS STAGE 中か（無敵・ステージ番号は据え置き）
 
     // ステージ開始時の演出メッセージ（残り表示秒数）
     this.flashText = '';
@@ -371,12 +389,13 @@ class BreakerGame {
     this.balls = [this._makeBall(this.paddle.x, this.paddle.y - BALL_R - 2, 0, 0, true)];
   }
 
-  _buildBricks() {
+  _buildBricks(patternOverride) {
     this.bricks = [];
     let breakable = 0;
 
     // ステージごとに形を変える（ひと巡りしたら最初に戻る）。銀・金は固定配置（ランダムにしない）
-    const pattern = STAGE_PATTERNS[(this.stage - 1) % STAGE_PATTERNS.length];
+    // patternOverride が渡された場合（BONUS STAGE 等）はそれを使う
+    const pattern = patternOverride || STAGE_PATTERNS[(this.stage - 1) % STAGE_PATTERNS.length];
     const rows = pattern.length;
 
     for (let row = 0; row < rows; row++) {
@@ -967,6 +986,13 @@ class BreakerGame {
   // ===== 進行 =====
 
   _loseLife() {
+    // BONUS STAGE は無敵：残機を減らさず、その場でボールを復帰して自動発射
+    if (this.inBonus) {
+      this.combo = 0;
+      this._resetField();
+      this._launchBalls();
+      return;
+    }
     this.lives--;
     this.combo = 0;
     this.missedThisStage = true; // ノーミスボーナスを無効化
@@ -980,12 +1006,24 @@ class BreakerGame {
   }
 
   _nextStage() {
-    // 直前ステージのクリアボーナス
-    let bonus = 100;                                   // 基本クリア
-    if (!this.missedThisStage) bonus += 300;           // ノーミス
-    const timeBonus = Math.max(0, Math.round((25 - this.stageTime) * 8)); // 早クリア
-    bonus += timeBonus;
-    this._addScore(bonus);
+    if (this.inBonus) {
+      // BONUS STAGE クリア：番号は進めず、通常進行（次の面）へ戻る。
+      // ボーナス面のクリアボーナス（ノーミス／早解き）は付けない（無敵のため）。
+      this.inBonus = false;
+    } else {
+      // 直前ステージのクリアボーナス
+      let bonus = 100;                                   // 基本クリア
+      if (!this.missedThisStage) bonus += 300;           // ノーミス
+      const timeBonus = Math.max(0, Math.round((25 - this.stageTime) * 8)); // 早クリア
+      bonus += timeBonus;
+      this._addScore(bonus);
+
+      // 1ループ（全ステージ）走破 → 次面へ進む前に BONUS STAGE を挿入（毎ループ）
+      if (this.stage % STAGE_PATTERNS.length === 0) {
+        this._startBonusStage();
+        return;
+      }
+    }
 
     this.stage++;
     this.baseSpeed = this._speedForStage(this.stage);
@@ -1003,6 +1041,19 @@ class BreakerGame {
     this._updateStageLabel();
     this._showFlash('STAGE ' + this.stage, 1.2);
     this._playStageJingle(); // 次ステージ開始のファンファーレ
+  }
+
+  /** BONUS STAGE を開始する。ステージ番号は据え置き（クリア後にちょうど次面へ進む）。 */
+  _startBonusStage() {
+    this.inBonus = true;
+    // 速度は現ループのまま（this.baseSpeed は変更しない）
+    this._buildBricks(BONUS_STAGE_PATTERN);
+    this._resetField();
+    this.missedThisStage = false;
+    this.stageTime = 0;
+    this._updateStageLabel();
+    this._showFlash('BONUS STAGE', 1.6);
+    this._playStageJingle();
   }
 
   /** コンボの段階（倍率と文字色）。2→1.2白 / 5→1.4青 / 10→1.6黄 / 15→1.8緑 / 20→2.0赤 */
@@ -1067,7 +1118,7 @@ class BreakerGame {
   }
 
   _updateStageLabel() {
-    if (this.stageEl) this.stageEl.textContent = 'STAGE ' + this.stage;
+    if (this.stageEl) this.stageEl.textContent = this.inBonus ? 'BONUS STAGE' : ('STAGE ' + this.stage);
   }
 
   _showFlash(text, sec) {
