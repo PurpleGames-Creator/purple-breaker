@@ -151,9 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (moveHint) moveHint.style.opacity = '1';
 
     // テスト用：URLの ?stage=2 または #stage=2 で開始ステージを指定できる
-    const startStage =
-      new URLSearchParams(location.search).get('stage') ||
-      new URLSearchParams(location.hash.replace(/^#/, '')).get('stage');
+    // ?bonus=1（または #bonus=1）で最初から BONUS STAGE をテストプレイできる
+    const qs = new URLSearchParams(location.search);
+    const hs = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const startStage = qs.get('stage') || hs.get('stage');
+    const startBonus = qs.get('bonus') === '1' || hs.get('bonus') === '1';
 
     currentGame = new BreakerGame({
       fieldEl: document.getElementById('game-field'),
@@ -162,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stageEl: document.getElementById('stage-label'),
       nickname,
       startStage,
+      startBonus,
       onGameOver: handleGameOver,
     });
     currentGame.start();

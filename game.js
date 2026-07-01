@@ -339,6 +339,7 @@ class BreakerGame {
     this.missedThisStage = false; // このステージでミスしたか（ノーミスボーナス判定）
     this.stageTime = 0;         // このステージの経過秒（タイムボーナス判定）
     this.inBonus = false;       // BONUS STAGE 中か（無敵・ステージ番号は据え置き）
+    this.startBonus = !!opts.startBonus; // テスト用：最初から BONUS STAGE で始める（?bonus=1）
 
     // ステージ開始時の演出メッセージ（残り表示秒数）
     this.flashText = '';
@@ -529,8 +530,13 @@ class BreakerGame {
     this.combo = 0;
     this.missedThisStage = false;
     this.stageTime = 0;
-    this._showFlash('STAGE ' + this.stage, 1.2);
-    this._playStageJingle(); // 開始ファンファーレ
+    if (this.startBonus && !this.demo) {
+      // テスト用：最初から BONUS STAGE で開始（?bonus=1）
+      this._startBonusStage();
+    } else {
+      this._showFlash('STAGE ' + this.stage, 1.2);
+      this._playStageJingle(); // 開始ファンファーレ
+    }
     this.lastTs = performance.now();
     this._updateHud();
     this._updateStageLabel();
