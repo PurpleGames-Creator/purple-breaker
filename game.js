@@ -230,18 +230,19 @@ const STAGE_PATTERNS = [
 /**
  * BONUS STAGE の配置。10面クリアごと（毎ループ）に挿入される特別面。
  * この面は「無敵」（ボールを落としても残機が減らない＝自動で打ち直し）。
- * すべて通常ブロック(N)で埋め、短時間で大量得点を稼がせる。ステージ番号には含めない。
+ * 通常ブロック(N)を壊して大量得点を稼ぐ。ステージ番号には含めない。
+ * 最下段(9行目)は金(G・壊れない)の飾りで、クリア判定は「通常ブロックを全部壊す」＝金は残ってOK。
  */
 const BONUS_STAGE_PATTERN = [
   'NNNNNNNNNNNNN',
-  'N.N.N.N.N.N.N',
   'NNNNNNNNNNNNN',
-  'N.N.N.N.N.N.N',
-  'NNNNNNNNNNNNN',
-  'N.N.N.N.N.N.N',
-  'NNNNNNNNNNNNN',
-  'N.N.N.N.N.N.N',
-  'NNNNNNNNNNNNN',
+  'NNNNN...NNNNN',
+  'NNNN.....NNNN',
+  'NNNNN...NNNNN',
+  'NNNNNN.NNNNNN',
+  'NNNNNN.NNNNNN',
+  'NNNNNN.NNNNNN',
+  'GGGGGG.GGGGGG',
 ];
 
 // カプセル（パワーアップ）
