@@ -19,6 +19,7 @@ const FIELD_H = 720;
 const PADDLE_W = 96;            // 通常幅
 const PADDLE_W_STEP = 36;       // 拡大(E)1個ごとに伸びる量
 const PADDLE_MAX_LEVEL = 5;     // 拡大の最大段階（96 + 36*5 = 276px）
+const BONUS_PADDLE_SCALE = 3;   // BONUS STAGE 中はバーの基準幅を3倍にする
 const PADDLE_H = 16;
 const PADDLE_BOTTOM_OFFSET = 48; // フィールド下端からの距離
 const PADDLE_KEY_SPEED = 620;    // キーボード操作時の移動速度(px/s)
@@ -434,13 +435,18 @@ class BreakerGame {
     this.bricksLeft = breakable;
   }
 
+  /** バーの基準幅（拡大アイテム0個の状態）。BONUS STAGE 中は3倍。 */
+  _basePaddleW() {
+    return this.inBonus ? PADDLE_W * BONUS_PADDLE_SCALE : PADDLE_W;
+  }
+
   /** パワーアップを全リセットして発射待ちに戻す（ミス時・ステージクリア時の両方） */
   _resetField() {
     this.capsules = [];
     this.lasers = [];
     this.extendLevel = 0;
     this.laser = false;
-    this.paddle.w = PADDLE_W;
+    this.paddle.w = this._basePaddleW();
     this.laserTimer = 0;
     this.laserTime = 0;
     this.through = false;
@@ -864,10 +870,15 @@ class BreakerGame {
     if (Math.random() >= CAPSULE_DROP_CHANCE) return; // 全体の落下率はステージ問わず一定
     // このステージで出さない種類を除外（除外分は残りの種類に振り分けられる）
     const patternIdx = (this.stage - 1) % STAGE_PATTERNS.length;
-    const excludedBase = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
+    let excludedBase = STAGE_EXCLUDED_CAPSULES[patternIdx] || [];
+    // BONUS STAGE：レーザー(L)と1UP(P)は出さない
+    if (this.inBonus) excludedBase = excludedBase.concat('L', 'P');
     // 貫通ボール中は新たな貫通(T)を出さない
     const excluded = this.through ? excludedBase.concat('T') : excludedBase;
-    const pool = excluded.length ? CAPSULE_KEYS.filter((k) => !excluded.includes(k)) : CAPSULE_KEYS;
+    let pool = excluded.length ? CAPSULE_KEYS.filter((k) => !excluded.includes(k)) : CAPSULE_KEYS;
+    // BONUS STAGE：マルチボール(D)の出現確率を通常の2倍に（Dの重みを倍増）
+    // ※L(4)とP(1)を除外した5枠にD(5)を足すので総数18のままDが5→10＝ちょうど2倍
+    if (this.inBonus) pool = pool.concat(pool.filter((k) => k === 'D'));
     if (pool.length === 0) return;
     const key = pool[Math.floor(Math.random() * pool.length)];
     this.capsules.push({
@@ -903,7 +914,7 @@ class BreakerGame {
     switch (type) {
       case 'E': // 拡大：取るたびに1段階ずつバーが伸びる
         this.extendLevel = Math.min(this.extendLevel + 1, PADDLE_MAX_LEVEL);
-        this.paddle.w = PADDLE_W + this.extendLevel * PADDLE_W_STEP;
+        this.paddle.w = this._basePaddleW() + this.extendLevel * PADDLE_W_STEP;
         this._setPaddleCenter(this.paddle.x); // 端からはみ出さないよう補正
         this._sndExtend(); // 低音ビヨーン
         break;
