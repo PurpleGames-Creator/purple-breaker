@@ -234,6 +234,7 @@ const STAGE_PATTERNS = [
  * 通常ブロック(N)を壊して大量得点を稼ぐ。ステージ番号には含めない。
  * 最下段(15行目)は金(G・壊れない)の飾りで、クリア判定は「通常ブロックを全部壊す」＝金は残ってOK。
  * 9〜14行目は「ステム(7列だけ空き)」と「空き行」を交互に並べた破線状。
+ * ↓これは「10面クリア後」のBONUS用（ロケット型）。
  */
 const BONUS_STAGE_PATTERN = [
   'NNNNNNNNNNNNN',
@@ -250,6 +251,28 @@ const BONUS_STAGE_PATTERN = [
   '.............',
   'NNNNNN.NNNNNN',
   '.............',
+  'GGGGGG.GGGGGG',
+];
+
+/**
+ * 「5面クリア後」のBONUS用（市松＝チェッカー柄）。大量得点向け。
+ * 1〜14行目は■と空きを交互に敷き詰め、最下段(15行目)は金（他BONUSと共通）。
+ */
+const BONUS_STAGE_PATTERN_5 = [
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
+  'N.N.N.N.N.N.N',
+  '.N.N.N.N.N.N.',
   'GGGGGG.GGGGGG',
 ];
 
@@ -350,6 +373,7 @@ class BreakerGame {
     this.stageTime = 0;         // このステージの経過秒（タイムボーナス判定）
     this.inBonus = false;       // BONUS STAGE 中か（無敵・ステージ番号は据え置き）
     this.startBonus = !!opts.startBonus; // テスト用：最初から BONUS STAGE で始める（?bonus=1）
+    this.startBonusVariant = opts.startBonusVariant || '10'; // '5'=市松 / '10'=ロケット
 
     // ステージ開始時の演出メッセージ（残り表示秒数）
     this.flashText = '';
@@ -546,8 +570,8 @@ class BreakerGame {
     this.missedThisStage = false;
     this.stageTime = 0;
     if (this.startBonus && !this.demo) {
-      // テスト用：最初から BONUS STAGE で開始（?bonus=1）
-      this._startBonusStage();
+      // テスト用：最初から BONUS STAGE で開始（?bonus=1=ロケット / ?bonus=5=市松）
+      this._startBonusStage(this.startBonusVariant === '5' ? BONUS_STAGE_PATTERN_5 : BONUS_STAGE_PATTERN);
     } else {
       this._showFlash('STAGE ' + this.stage, 1.2);
       this._playStageJingle(); // 開始ファンファーレ
@@ -1055,10 +1079,14 @@ class BreakerGame {
       this._addScore(bonus);
 
       // 各ループの5面目・10面目クリア後に BONUS STAGE を挿入
-      // （流れ：1〜5→BONUS→6〜10→BONUS→2周目も同様）
+      // （流れ：1〜5→BONUS(市松)→6〜10→BONUS(ロケット)→2周目も同様）
       const inLoopStage = ((this.stage - 1) % STAGE_PATTERNS.length) + 1; // ループ内の面番号(1〜10)
-      if (inLoopStage === 5 || inLoopStage === 10) {
-        this._startBonusStage();
+      if (inLoopStage === 5) {
+        this._startBonusStage(BONUS_STAGE_PATTERN_5);
+        return;
+      }
+      if (inLoopStage === 10) {
+        this._startBonusStage(BONUS_STAGE_PATTERN);
         return;
       }
     }
@@ -1081,11 +1109,11 @@ class BreakerGame {
     this._playStageJingle(); // 次ステージ開始のファンファーレ
   }
 
-  /** BONUS STAGE を開始する。ステージ番号は据え置き（クリア後にちょうど次面へ進む）。 */
-  _startBonusStage() {
+  /** BONUS STAGE を開始する。pattern で配置を指定（5面後=市松 / 10面後=ロケット）。ステージ番号は据え置き。 */
+  _startBonusStage(pattern = BONUS_STAGE_PATTERN) {
     this.inBonus = true;
     // 速度は現ループのまま（this.baseSpeed は変更しない）
-    this._buildBricks(BONUS_STAGE_PATTERN);
+    this._buildBricks(pattern);
     this._resetField();
     this.missedThisStage = false;
     this.stageTime = 0;

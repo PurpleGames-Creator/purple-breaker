@@ -155,7 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const qs = new URLSearchParams(location.search);
     const hs = new URLSearchParams(location.hash.replace(/^#/, ''));
     const startStage = qs.get('stage') || hs.get('stage');
-    const startBonus = qs.get('bonus') === '1' || hs.get('bonus') === '1';
+    // ?bonus=1 / ?bonus=10 → 10面後BONUS(ロケット)、?bonus=5 → 5面後BONUS(市松)
+    const bonusParam = qs.get('bonus') || hs.get('bonus');
+    const startBonus = bonusParam === '1' || bonusParam === '5' || bonusParam === '10';
+    const startBonusVariant = bonusParam === '5' ? '5' : '10';
 
     currentGame = new BreakerGame({
       fieldEl: document.getElementById('game-field'),
@@ -165,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       nickname,
       startStage,
       startBonus,
+      startBonusVariant,
       onGameOver: handleGameOver,
     });
     currentGame.start();
