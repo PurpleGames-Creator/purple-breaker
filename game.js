@@ -1054,8 +1054,10 @@ class BreakerGame {
       bonus += timeBonus;
       this._addScore(bonus);
 
-      // 1ループ（全ステージ）走破 → 次面へ進む前に BONUS STAGE を挿入（毎ループ）
-      if (this.stage % STAGE_PATTERNS.length === 0) {
+      // 各ループの5面目・10面目クリア後に BONUS STAGE を挿入
+      // （流れ：1〜5→BONUS→6〜10→BONUS→2周目も同様）
+      const inLoopStage = ((this.stage - 1) % STAGE_PATTERNS.length) + 1; // ループ内の面番号(1〜10)
+      if (inLoopStage === 5 || inLoopStage === 10) {
         this._startBonusStage();
         return;
       }
