@@ -525,12 +525,19 @@ class BreakerGame {
       this._launchBalls();
     };
 
+    // スマホで長押しすると、その部分が拡大表示される（テキスト選択の虫眼鏡）という報告への対処。
+    // CSS の user-select / -webkit-touch-callout だけでは端末によって消えなかったので、
+    // ゲームエリアのタッチはブラウザの既定動作ごと止める。
+    // passive: true のままでは preventDefault が無視されるので false が必須。
+    this._onTouchStart = (e) => { e.preventDefault(); this._onPointerDown(e); };
+    this._onTouchMove = (e) => { e.preventDefault(); this._onPointerMove(e); };
+
     // 入力はゲーム画面エリア全体で受ける（パプ太郎より下の余白でも発射・操作できる）
     this._inputTarget = this.canvas.closest('.game-section') || this.canvas;
     this._inputTarget.addEventListener('mousemove', this._onPointerMove);
     this._inputTarget.addEventListener('mousedown', this._onPointerDown);
-    this._inputTarget.addEventListener('touchstart', this._onPointerDown, { passive: true });
-    this._inputTarget.addEventListener('touchmove', this._onPointerMove, { passive: true });
+    this._inputTarget.addEventListener('touchstart', this._onTouchStart, { passive: false });
+    this._inputTarget.addEventListener('touchmove', this._onTouchMove, { passive: false });
 
     this._onKeyDown = (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'a') { this.keyLeft = true; e.preventDefault(); }
@@ -550,8 +557,8 @@ class BreakerGame {
     const t = this._inputTarget || this.canvas;
     t.removeEventListener('mousemove', this._onPointerMove);
     t.removeEventListener('mousedown', this._onPointerDown);
-    t.removeEventListener('touchstart', this._onPointerDown);
-    t.removeEventListener('touchmove', this._onPointerMove);
+    t.removeEventListener('touchstart', this._onTouchStart);
+    t.removeEventListener('touchmove', this._onTouchMove);
     document.removeEventListener('keydown', this._onKeyDown);
     document.removeEventListener('keyup', this._onKeyUp);
   }

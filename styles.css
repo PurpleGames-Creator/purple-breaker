@@ -284,6 +284,7 @@ body {
 
 /* 残機（ミニパプ太郎）：STAGE表示の下に中央寄せ。多くても折り返してバランスよく */
 .game-lives-value {
+  pointer-events: none;
   display: flex;
   align-items: center;
   align-content: center;
@@ -421,6 +422,9 @@ body {
 }
 
 .stage-label {
+  /* 長押しの起点になり得るので、そもそもタッチ対象にしない。
+     ここへの指も .game-section が受け取るのでパドル操作の邪魔にもならない */
+  pointer-events: none;
   margin: 10px 0 0;
   text-align: center;
   font-family: "Orbitron", sans-serif;
