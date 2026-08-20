@@ -19,6 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
       nicknameInput.classList.remove('invalid');
     });
   }
+
+  // ニックネームは全ゲーム共通キーで保存し、次回起動時に自動で復元する
+  const NICKNAME_KEY = 'purple_games_nickname';
+  const loadSavedNickname = () => {
+    try { return (localStorage.getItem(NICKNAME_KEY) || '').trim(); } catch (e) { return ''; }
+  };
+  const saveNickname = (name) => {
+    try { localStorage.setItem(NICKNAME_KEY, name); } catch (e) { /* 無視 */ }
+  };
+  if (nicknameInput && !nicknameInput.value) {
+    const savedNickname = loadSavedNickname();
+    const maxLen = nicknameInput.maxLength;
+    if (savedNickname) nicknameInput.value = maxLen > 0 ? savedNickname.slice(0, maxLen) : savedNickname;
+  }
   const gameoverOverlay    = document.getElementById('gameover-overlay');
   const gameoverScoreValue = document.getElementById('gameover-score-value');
   const gameoverBadge      = document.getElementById('gameover-badge');
@@ -177,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startButton.addEventListener('click', () => {
     const nickname = nicknameInput.value.trim();
     if (!nickname) { showNickError(); return; }
+    saveNickname(nickname);
 
     stopDemo(); // 本編開始時はデモを止める
     screenHome.classList.remove('screen--active');
