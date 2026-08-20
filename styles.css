@@ -30,6 +30,11 @@ html, body {
   top: 0; left: 0;
   overscroll-behavior: none;
   touch-action: manipulation; /* ダブルタップ拡大を無効化（スクロールは維持） */
+  /* iOS は -webkit-user-select: none だけでは長押しの虫眼鏡（選択ルーペ）が出る。
+     -webkit-touch-callout: none まで指定して初めて止まる */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body {
@@ -155,6 +160,8 @@ body {
   font-size: 14px;
   margin-bottom: 12px;
   outline: none;
+  /* 入力欄だけは選択・コピー・ペーストできるように戻す */
+  -webkit-touch-callout: default;
   -webkit-user-select: text;
   user-select: text;
 }
