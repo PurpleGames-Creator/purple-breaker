@@ -126,19 +126,26 @@ body {
 }
 
 .start-logo-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   line-height: 0;
   text-decoration: none;
   flex-shrink: 0;
 }
+/* 見た目は 32px のまま、押せる範囲だけ 44px に広げる */
+.start-logo-link::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
 
+/* HP へのパプ太郎(2026-09-22 Purple Park の文字ロゴから差し替え。全ゲームで統一) */
 .start-logo {
   display: block;
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.45));
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
   transition: transform 0.12s ease;
 }
 
